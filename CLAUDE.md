@@ -75,8 +75,17 @@ Assets/ScriptableObjects/
 - `MelodyData.cs` - ScriptableObject for melody tracks (sorted list of time+lane)
 - `UnitClassData.cs` - ScriptableObject for unit types (stats, requirements, bonuses)
 
+**Unit System** (`Scripts/Units/`)
+- `Unit.cs` - Main unit component with autonomous behavior (Idle→Moving→Attacking states)
+- `UnitVisuals.cs` - Health bar, selection indicator, state display
+- `UnitSpawner.cs` - Spawns units from prefabs with object pooling
+- `UnitMovement.cs` - NavMeshAgent movement helper (optional)
+- `UnitSelector.cs` - Debug tool for unit selection/inspection
+- `UnitTestRunner.cs` - Test harness (F1-F5 hotkeys)
+
 **Editor Tools** (`Scripts/Editor/`)
 - `SampleAssetCreator.cs` - Tools > Cantus Crucis > Create Sample Assets
+- `UnitPrefabGenerator.cs` - Tools > Cantus Crucis > Generate Unit Prefabs
 
 ### Timing Windows (from GDD)
 
@@ -94,16 +103,30 @@ Assets/ScriptableObjects/
 ## Current State
 
 **Implemented:**
+
 - ✅ 2D NavMesh pathfinding (NavMeshPlus)
 - ✅ Rhythm input system with 5-lane note highway
 - ✅ ScriptableObjects for melodies and unit classes
 - ✅ Sample asset generator
+- ✅ Unit system with autonomous behavior (Idle→Moving→Attacking)
+- ✅ Prefab-based unit spawning with object pooling
+- ✅ Unit prefab generator editor tool
 
 **In Progress:**
-- Unit system with autonomous behavior
-- Command system connecting melodies to effects
-- Battle system
 
-**Test Scripts** (to be refactored):
-- `RTSUnitCommander.cs` - Unit selection
-- `RTSUnitMovement.cs` - NavMeshAgent movement
+- Command system connecting melodies to unit effects
+- Battle system / morale
+
+## Unit Prefab Workflow
+
+1. **Create UnitClassData**: Right-click > Create > Cantus > Unit Class
+2. **Generate Prefab**: Right-click the UnitClassData > Create Unit Prefab
+3. **Configure Prefab**: Adjust NavMeshAgent radius, add sprites/animations
+4. **Spawn in Game**: Use `UnitSpawner.SpawnUnit(prefab, position, isPlayer)`
+
+Prefabs are stored in `Assets/Prefabs/Units/` and include:
+
+- Unit component (references UnitClassData)
+- NavMeshAgent (configured for 2D)
+- UnitVisuals (health bar, selection)
+- SpriteRenderer and Collider2D
