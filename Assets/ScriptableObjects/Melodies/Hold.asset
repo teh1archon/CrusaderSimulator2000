@@ -10,25 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff6f65c284d7ada49976af4eadb77476, type: 3}
-  m_Name: Defend
+  m_Name: Hold
   m_EditorClassIdentifier: 
-  melodyName: Defend
-  bpm: 100
-  duration: 4
+  melodyName: Hold
+  bpm: 80
+  duration: 2
   notes:
   - time: 0.5
     lane: 4
   - time: 1.5
-    lane: 4
-  - time: 2.5
-    lane: 4
-  - time: 3.5
-    lane: 4
-  - time: 0.5
-    lane: 4
-  - time: 1.5
-    lane: 4
-  - time: 2.5
-    lane: 4
-  - time: 3.5
     lane: 4

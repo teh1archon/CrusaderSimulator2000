@@ -22,6 +22,15 @@ public class Unit : MonoBehaviour
     [SerializeField] private float attackCooldown = 1f;
     private float lastAttackTime;
 
+    [Header("Detection")]
+    [Tooltip("How far this unit can detect enemies")]
+    [SerializeField] private float detectionRange = 10f;
+    [Tooltip("If true, unit waits for commands before engaging (player units)")]
+    [SerializeField] private bool waitForCommand = true;
+    [Tooltip("Delay before enemy units react to spotting player units")]
+    [SerializeField] private float reactionDelay = 0.5f;
+    private float enemySpottedTime = -1f;
+
     [Header("State")]
     [SerializeField] private UnitState currentState = UnitState.Idle;
     [SerializeField] private Unit currentTarget;
@@ -135,6 +144,7 @@ public class Unit : MonoBehaviour
     {
         classData = data;
         isPlayerUnit = playerUnit;
+        waitForCommand = playerUnit;  // Player units wait for commands, enemies don't
         InitializeFromClassData();
     }
 
@@ -144,6 +154,7 @@ public class Unit : MonoBehaviour
     public void Initialize(bool playerUnit)
     {
         isPlayerUnit = playerUnit;
+        waitForCommand = playerUnit;  // Player units wait for commands, enemies don't
         InitializeFromClassData();
     }
 
@@ -156,6 +167,7 @@ public class Unit : MonoBehaviour
         currentState = UnitState.Idle;
         currentTarget = null;
         lastAttackTime = 0f;
+        enemySpottedTime = -1f;
 
         // Reset buffs
         damageMultiplier = 1f;
@@ -176,12 +188,31 @@ public class Unit : MonoBehaviour
 
     private void SearchForTarget()
     {
-        // Find nearest enemy
-        Unit nearestEnemy = FindNearestEnemy();
-        if (nearestEnemy != null)
+        // Player units wait for commands - don't auto-search
+        if (waitForCommand) return;
+
+        // Enemy units search within detection range for ACTIVE threats only
+        // (player units that are moving/attacking, not idle ones)
+        Unit enemy = FindNearestActiveEnemyInRange(detectionRange);
+        if (enemy != null)
         {
-            currentTarget = nearestEnemy;
-            SetState(UnitState.Moving);
+            // First time spotting? Start reaction timer
+            if (enemySpottedTime < 0)
+            {
+                enemySpottedTime = Time.time;
+            }
+
+            // Wait for reaction delay before engaging
+            if (Time.time >= enemySpottedTime + reactionDelay)
+            {
+                currentTarget = enemy;
+                SetState(UnitState.Moving);
+                enemySpottedTime = -1f;  // Reset for next time
+            }
+        }
+        else
+        {
+            enemySpottedTime = -1f;  // Lost sight, reset timer
         }
     }
 
@@ -267,15 +298,51 @@ public class Unit : MonoBehaviour
 
     private Unit FindNearestEnemy()
     {
+        return FindNearestEnemyInRange(float.MaxValue);
+    }
+
+    private Unit FindNearestEnemyInRange(float maxRange)
+    {
         Unit[] allUnits = FindObjectsByType<Unit>(FindObjectsSortMode.None);
         Unit nearest = null;
-        float nearestDist = float.MaxValue;
+        float nearestDist = maxRange;
 
         foreach (var unit in allUnits)
         {
             if (unit == this) continue;
             if (unit.isPlayerUnit == this.isPlayerUnit) continue; // Same team
             if (!unit.IsAlive) continue;
+
+            float dist = Vector2.Distance(transform.position, unit.transform.position);
+            if (dist < nearestDist)
+            {
+                nearestDist = dist;
+                nearest = unit;
+            }
+        }
+
+        return nearest;
+    }
+
+    /// <summary>
+    /// Find nearest enemy that is actively engaging (Moving or Attacking state).
+    /// Used by enemy AI to only react to player units that have been commanded.
+    /// </summary>
+    private Unit FindNearestActiveEnemyInRange(float maxRange)
+    {
+        Unit[] allUnits = FindObjectsByType<Unit>(FindObjectsSortMode.None);
+        Unit nearest = null;
+        float nearestDist = maxRange;
+
+        foreach (var unit in allUnits)
+        {
+            if (unit == this) continue;
+            if (unit.isPlayerUnit == this.isPlayerUnit) continue; // Same team
+            if (!unit.IsAlive) continue;
+
+            // Only react to units that are actively engaging (not idle)
+            if (unit.currentState == UnitState.Idle || unit.currentState == UnitState.Defending)
+                continue;
 
             float dist = Vector2.Distance(transform.position, unit.transform.position);
             if (dist < nearestDist)
@@ -328,6 +395,20 @@ public class Unit : MonoBehaviour
     #endregion
 
     #region Command Effects
+
+    /// <summary>
+    /// Trigger engagement with nearest enemy (called by CommandExecutor for Attack/Charge commands)
+    /// Uses extended detection range since this is an explicit command
+    /// </summary>
+    public void EngageNearestEnemy()
+    {
+        Unit enemy = FindNearestEnemyInRange(detectionRange * 2f);  // Extended range for commands
+        if (enemy != null)
+        {
+            currentTarget = enemy;
+            SetState(UnitState.Moving);
+        }
+    }
 
     /// <summary>
     /// Apply buff from a command (called by CommandExecutor)
@@ -420,6 +501,10 @@ public class Unit : MonoBehaviour
         // Draw attack range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        // Draw detection range
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
 
         // Draw line to target
         if (currentTarget != null)

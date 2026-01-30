@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c24bab7a1a44cf240a82f274cf7b75bd, type: 3}
+  m_Name: Charge
+  m_EditorClassIdentifier: 
+  commandName: Charge
+  icon: {fileID: 0}
+  description: Order a devastating charge! High damage and speed boost, but risky.
+  melody: {fileID: 11400000, guid: 2d127bbfe39d23a4c8d366cfdb0c7273, type: 2}
+  effectType: 1
+  targetType: 0
+  effectRadius: 10
+  baseStrength: 1.5
+  duration: 5
+  moraleGainOnSuccess: 5
+  moraleLossOnFail: 5
+  minimumScoreToExecute: 30
+  perfectScoreThreshold: 85

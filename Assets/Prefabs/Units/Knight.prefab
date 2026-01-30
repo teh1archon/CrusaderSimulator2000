@@ -128,6 +128,9 @@ MonoBehaviour:
   currentXP: 0
   attackRange: 1.5
   attackCooldown: 1
+  detectionRange: 4
+  waitForCommand: 1
+  reactionDelay: 0.5
   currentState: 0
   currentTarget: {fileID: 0}
   isPlayerUnit: 1

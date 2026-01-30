@@ -30,3 +30,17 @@ MonoBehaviour:
     lane: 1
   - time: 3.5
     lane: 0
+  - time: 0.5
+    lane: 4
+  - time: 1
+    lane: 3
+  - time: 1.5
+    lane: 2
+  - time: 2
+    lane: 1
+  - time: 2.5
+    lane: 0
+  - time: 3
+    lane: 1
+  - time: 3.5
+    lane: 0

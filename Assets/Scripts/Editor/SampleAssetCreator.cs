@@ -11,12 +11,14 @@ public class SampleAssetCreator : Editor
 {
     private const string UNITS_PATH = "Assets/ScriptableObjects/Units";
     private const string MELODIES_PATH = "Assets/ScriptableObjects/Melodies";
+    private const string COMMANDS_PATH = "Assets/ScriptableObjects/Commands";
 
     [MenuItem("Tools/Cantus Crucis/Create Sample Assets")]
     public static void CreateAllSampleAssets()
     {
         CreateSampleUnitClasses();
         CreateSampleMelodies();
+        CreateSampleCommands();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log("Sample assets created! Check ScriptableObjects folder.");
@@ -105,6 +107,137 @@ public class SampleAssetCreator : Editor
         EditorUtility.SetDirty(rally);
 
         Debug.Log($"Created 3 melody assets in {MELODIES_PATH}");
+    }
+
+    [MenuItem("Tools/Cantus Crucis/Create Sample Commands")]
+    public static void CreateSampleCommands()
+    {
+        EnsureDirectoryExists(COMMANDS_PATH);
+
+        // Load melodies to link
+        var attackMelody = AssetDatabase.LoadAssetAtPath<MelodyData>($"{MELODIES_PATH}/Attack.asset");
+        var defendMelody = AssetDatabase.LoadAssetAtPath<MelodyData>($"{MELODIES_PATH}/Defend.asset");
+        var rallyMelody = AssetDatabase.LoadAssetAtPath<MelodyData>($"{MELODIES_PATH}/Rally.asset");
+
+        // Attack Command
+        CreateCommand("Attack",
+            description: "Order your troops to aggressively engage the enemy. Increases damage dealt.",
+            melody: attackMelody,
+            effect: CommandEffect.Attack,
+            target: CommandTarget.AllPlayerUnits,
+            baseStrength: 1.2f,
+            duration: 8f,
+            moraleGain: 3,
+            moraleLoss: 2);
+
+        // Defend Command
+        CreateCommand("Defend",
+            description: "Order your troops to hold position and brace for attack. Increases defense.",
+            melody: defendMelody,
+            effect: CommandEffect.Defend,
+            target: CommandTarget.AllPlayerUnits,
+            baseStrength: 1.3f,
+            duration: 10f,
+            moraleGain: 2,
+            moraleLoss: 1);
+
+        // Rally Command
+        CreateCommand("Rally",
+            description: "Inspire your troops with a rallying cry. Restores morale and provides a small buff.",
+            melody: rallyMelody,
+            effect: CommandEffect.Rally,
+            target: CommandTarget.AllPlayerUnits,
+            baseStrength: 1.5f,
+            duration: 6f,
+            moraleGain: 10,
+            moraleLoss: 3);
+
+        // Charge Command (uses Attack melody with different effect)
+        var chargeMelody = CreateMelody("Charge", bpm: 160, duration: 2.5f);
+        if (chargeMelody.notes.Count == 0)
+        {
+            chargeMelody.notes.Add(new MelodyData.NoteEntry(0.3f, NoteLane.Key5));
+            chargeMelody.notes.Add(new MelodyData.NoteEntry(0.6f, NoteLane.Key5));
+            chargeMelody.notes.Add(new MelodyData.NoteEntry(0.9f, NoteLane.KeyT));
+            chargeMelody.notes.Add(new MelodyData.NoteEntry(1.2f, NoteLane.KeyT));
+            chargeMelody.notes.Add(new MelodyData.NoteEntry(1.5f, NoteLane.KeyG));
+            chargeMelody.notes.Add(new MelodyData.NoteEntry(1.8f, NoteLane.KeyB));
+            chargeMelody.notes.Add(new MelodyData.NoteEntry(2.1f, NoteLane.KeySpace));
+            EditorUtility.SetDirty(chargeMelody);
+        }
+
+        CreateCommand("Charge",
+            description: "Order a devastating charge! High damage and speed boost, but risky.",
+            melody: chargeMelody,
+            effect: CommandEffect.Charge,
+            target: CommandTarget.AllPlayerUnits,
+            baseStrength: 1.5f,
+            duration: 5f,
+            moraleGain: 5,
+            moraleLoss: 5,
+            minScore: 30,
+            perfectScore: 85);
+
+        // Hold Command (simple melody)
+        var holdMelody = CreateMelody("Hold", bpm: 80, duration: 2f);
+        if (holdMelody.notes.Count == 0)
+        {
+            holdMelody.notes.Add(new MelodyData.NoteEntry(0.5f, NoteLane.KeySpace));
+            holdMelody.notes.Add(new MelodyData.NoteEntry(1.5f, NoteLane.KeySpace));
+            EditorUtility.SetDirty(holdMelody);
+        }
+
+        CreateCommand("Hold",
+            description: "Order all units to stop and await further commands.",
+            melody: holdMelody,
+            effect: CommandEffect.Hold,
+            target: CommandTarget.AllPlayerUnits,
+            baseStrength: 1.0f,
+            duration: 0f,  // Instant
+            moraleGain: 1,
+            moraleLoss: 1,
+            minScore: 10,
+            perfectScore: 50);
+
+        Debug.Log($"Created 5 command assets in {COMMANDS_PATH}");
+    }
+
+    private static void CreateCommand(
+        string name,
+        string description,
+        MelodyData melody,
+        CommandEffect effect,
+        CommandTarget target,
+        float baseStrength,
+        float duration,
+        int moraleGain,
+        int moraleLoss,
+        int minScore = 20,
+        int perfectScore = 80)
+    {
+        string path = $"{COMMANDS_PATH}/{name}.asset";
+
+        var existing = AssetDatabase.LoadAssetAtPath<CommandData>(path);
+        if (existing != null)
+        {
+            Debug.Log($"Command {name} already exists, skipping.");
+            return;
+        }
+
+        var command = ScriptableObject.CreateInstance<CommandData>();
+        command.commandName = name;
+        command.description = description;
+        command.melody = melody;
+        command.effectType = effect;
+        command.targetType = target;
+        command.baseStrength = baseStrength;
+        command.duration = duration;
+        command.moraleGainOnSuccess = moraleGain;
+        command.moraleLossOnFail = moraleLoss;
+        command.minimumScoreToExecute = minScore;
+        command.perfectScoreThreshold = perfectScore;
+
+        AssetDatabase.CreateAsset(command, path);
     }
 
     private static void CreateUnitClass(

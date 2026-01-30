@@ -18,6 +18,10 @@ public class MelodyData : ScriptableObject
     [Tooltip("Total duration of the melody in seconds")]
     public float duration = 4f;
 
+    [Tooltip("Countdown delay before notes start scrolling (seconds)")]
+    [Range(0f, 5f)]
+    public float startDelay = 2f;
+
     [Tooltip("Sorted list of notes - add entries with time (seconds) and lane (key)")]
     public List<NoteEntry> notes = new List<NoteEntry>();
 

@@ -10,25 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff6f65c284d7ada49976af4eadb77476, type: 3}
-  m_Name: Defend
+  m_Name: Charge
   m_EditorClassIdentifier: 
-  melodyName: Defend
-  bpm: 100
-  duration: 4
+  melodyName: Charge
+  bpm: 160
+  duration: 2.5
   notes:
-  - time: 0.5
-    lane: 4
+  - time: 0.3
+    lane: 0
+  - time: 0.6
+    lane: 0
+  - time: 0.9
+    lane: 1
+  - time: 1.2
+    lane: 1
   - time: 1.5
-    lane: 4
-  - time: 2.5
-    lane: 4
-  - time: 3.5
-    lane: 4
-  - time: 0.5
-    lane: 4
-  - time: 1.5
-    lane: 4
-  - time: 2.5
-    lane: 4
-  - time: 3.5
+    lane: 2
+  - time: 1.8
+    lane: 3
+  - time: 2.1
     lane: 4

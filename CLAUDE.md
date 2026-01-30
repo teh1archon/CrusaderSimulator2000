@@ -83,6 +83,15 @@ Assets/ScriptableObjects/
 - `UnitSelector.cs` - Debug tool for unit selection/inspection
 - `UnitTestRunner.cs` - Test harness (F1-F5 hotkeys)
 
+**Combat System** (`Scripts/Combat/`)
+- `CommandData.cs` - ScriptableObject linking melody to effect type
+- `CommandExecutor.cs` - Executes commands based on rhythm score, applies buffs
+- `MoraleManager.cs` - Shared army morale gauge, affects effectiveness
+- `CommandTestRunner.cs` - Test harness for command system
+
+**UI** (`Scripts/UI/`)
+- `CommandUI.cs` - Command selection list and morale bar display
+
 **Editor Tools** (`Scripts/Editor/`)
 - `SampleAssetCreator.cs` - Tools > Cantus Crucis > Create Sample Assets
 - `UnitPrefabGenerator.cs` - Tools > Cantus Crucis > Generate Unit Prefabs
@@ -111,11 +120,13 @@ Assets/ScriptableObjects/
 - ✅ Unit system with autonomous behavior (Idle→Moving→Attacking)
 - ✅ Prefab-based unit spawning with object pooling
 - ✅ Unit prefab generator editor tool
+- ✅ Command system linking melodies to unit effects
+- ✅ Morale system with state-based effectiveness
 
 **In Progress:**
 
-- Command system connecting melodies to unit effects
-- Battle system / morale
+- Battle flow (win/lose conditions)
+- Polish and balancing
 
 ## Unit Prefab Workflow
 

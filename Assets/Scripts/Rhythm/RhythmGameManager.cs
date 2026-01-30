@@ -17,8 +17,11 @@ public class RhythmGameManager : MonoBehaviour
     [Header("Current State")]
     [SerializeField] private MelodyData currentMelody;
     [SerializeField] private bool isPlaying;
+    [SerializeField] private bool isCountingDown;
     [SerializeField] private float melodyTime;
+    [SerializeField] private float countdownTime;
     [SerializeField] private int currentScore;
+    private int lastCountdownSecond = -1;
 
     // Input mapping
     private readonly Dictionary<NoteLane, KeyCode> laneKeys = new Dictionary<NoteLane, KeyCode>
@@ -42,6 +45,8 @@ public class RhythmGameManager : MonoBehaviour
     public event Action<NoteLane, HitJudgement> OnNoteHit;
     public event Action<NoteLane> OnNoteMissed;
     public event Action<int> OnScoreChanged;
+    public event Action<int> OnCountdownTick;  // Seconds remaining (3, 2, 1, 0=GO!)
+    public event Action OnCountdownComplete;
 
     private struct ActiveNote
     {
@@ -62,7 +67,34 @@ public class RhythmGameManager : MonoBehaviour
 
     private void Update()
     {
-        if (!isPlaying || currentMelody == null) return;
+        if (currentMelody == null) return;
+
+        // Handle countdown phase
+        if (isCountingDown)
+        {
+            countdownTime -= Time.deltaTime;
+
+            // Fire countdown tick events (3, 2, 1...)
+            int currentSecond = Mathf.CeilToInt(countdownTime);
+            if (currentSecond != lastCountdownSecond && currentSecond >= 0)
+            {
+                lastCountdownSecond = currentSecond;
+                OnCountdownTick?.Invoke(currentSecond);
+            }
+
+            // Countdown complete
+            if (countdownTime <= 0f)
+            {
+                isCountingDown = false;
+                isPlaying = true;
+                melodyTime = 0f;
+                OnCountdownComplete?.Invoke();
+                Debug.Log("Countdown complete - melody starting!");
+            }
+            return;
+        }
+
+        if (!isPlaying) return;
 
         melodyTime += Time.deltaTime;
 
@@ -94,7 +126,7 @@ public class RhythmGameManager : MonoBehaviour
         }
 
         // If already playing, interrupt current melody
-        if (isPlaying)
+        if (isPlaying || isCountingDown)
         {
             InterruptMelody();
         }
@@ -104,7 +136,22 @@ public class RhythmGameManager : MonoBehaviour
         currentScore = 0;
         nextNoteIndex = 0;
         activeNotes.Clear();
-        isPlaying = true;
+        lastCountdownSecond = -1;
+
+        // Start countdown if delay is configured
+        if (melody.startDelay > 0f)
+        {
+            countdownTime = melody.startDelay;
+            isCountingDown = true;
+            isPlaying = false;
+            OnCountdownTick?.Invoke(Mathf.CeilToInt(countdownTime));
+            Debug.Log($"Starting countdown ({melody.startDelay}s) for melody: {melody.melodyName}");
+        }
+        else
+        {
+            isCountingDown = false;
+            isPlaying = true;
+        }
 
         OnMelodyStarted?.Invoke(melody);
         OnScoreChanged?.Invoke(currentScore);
@@ -117,9 +164,10 @@ public class RhythmGameManager : MonoBehaviour
     /// </summary>
     public void InterruptMelody()
     {
-        if (!isPlaying) return;
+        if (!isPlaying && !isCountingDown) return;
 
         isPlaying = false;
+        isCountingDown = false;
         OnMelodyInterrupted?.Invoke();
         Debug.Log("Melody interrupted!");
     }
@@ -243,6 +291,8 @@ public class RhythmGameManager : MonoBehaviour
 
     // Public accessors
     public bool IsPlaying => isPlaying;
+    public bool IsCountingDown => isCountingDown;
+    public float CountdownTime => countdownTime;
     public float MelodyTime => melodyTime;
     public float MelodyDuration => currentMelody?.duration ?? 0f;
     public int CurrentScore => currentScore;

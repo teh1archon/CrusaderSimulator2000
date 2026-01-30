@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c24bab7a1a44cf240a82f274cf7b75bd, type: 3}
+  m_Name: Rally
+  m_EditorClassIdentifier: 
+  commandName: Rally
+  icon: {fileID: 0}
+  description: Inspire your troops with a rallying cry. Restores morale and provides
+    a small buff.
+  melody: {fileID: 11400000, guid: b436a60ddf9a54b488b2e36e0a9df350, type: 2}
+  effectType: 4
+  targetType: 0
+  effectRadius: 10
+  baseStrength: 1.5
+  duration: 6
+  moraleGainOnSuccess: 10
+  moraleLossOnFail: 3
+  minimumScoreToExecute: 20
+  perfectScoreThreshold: 80
