@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52ecba7d5be40764391a5fdbe989e790, type: 3}
+  m_Name: TestBattlefield
+  m_EditorClassIdentifier: Assembly-CSharp::LevelData
+  levelName: Test Battlefield
+  backgroundSprite: {fileID: 21300000, guid: 03782d056e5c5174797c5fead6ef555a, type: 3}
+  battlefieldSize: {x: 20, y: 15}
+  obstacles:
+  - prefab: {fileID: 3406585454890054658, guid: a664d918a4dbe504392319c227446fc7, type: 3}
+    position: {x: -2, y: 2, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 3, z: 1}
+  - prefab: {fileID: 3406585454890054658, guid: a664d918a4dbe504392319c227446fc7, type: 3}
+    position: {x: 2, y: -1, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 2.5, z: 1}
+  - prefab: {fileID: 3406585454890054658, guid: a664d918a4dbe504392319c227446fc7, type: 3}
+    position: {x: 0, y: -3, z: 0}
+    rotation: {x: 0, y: 0, z: 0.38268346, w: 0.9238795}
+    scale: {x: 1, y: 2, z: 1}
+  playerUnits:
+  - unitPrefab: {fileID: 7292076909691589587, guid: e849fcfec5cd3a449bd0d4f86a6d7dcb, type: 3}
+    spawnPosition: {x: -7, y: 2, z: 0}
+  - unitPrefab: {fileID: 7292076909691589587, guid: e849fcfec5cd3a449bd0d4f86a6d7dcb, type: 3}
+    spawnPosition: {x: -7, y: 0, z: 0}
+  - unitPrefab: {fileID: 7292076909691589587, guid: e849fcfec5cd3a449bd0d4f86a6d7dcb, type: 3}
+    spawnPosition: {x: -7, y: -2, z: 0}
+  enemyUnits:
+  - unitPrefab: {fileID: 7292076909691589587, guid: e849fcfec5cd3a449bd0d4f86a6d7dcb, type: 3}
+    spawnPosition: {x: 7, y: 2, z: 0}
+  - unitPrefab: {fileID: 7292076909691589587, guid: e849fcfec5cd3a449bd0d4f86a6d7dcb, type: 3}
+    spawnPosition: {x: 7, y: 0, z: 0}
+  - unitPrefab: {fileID: 7292076909691589587, guid: e849fcfec5cd3a449bd0d4f86a6d7dcb, type: 3}
+    spawnPosition: {x: 7, y: -2, z: 0}
+  availableCommands:
+  - {fileID: 11400000, guid: c86d293431b8bac468f39837e0f76cdc, type: 2}
+  - {fileID: 11400000, guid: 0f0df695ef180df4a95ef57e66c34cdb, type: 2}
+  - {fileID: 11400000, guid: f83959d482016b04b8fcdb79eea10900, type: 2}

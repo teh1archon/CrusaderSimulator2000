@@ -181,14 +181,14 @@ public class LevelManager : MonoBehaviour
                 continue;
             }
 
-            GameObject obstacle = Instantiate(
-                entry.prefab,
-                entry.position,
-                entry.rotation,
-                obstacleParent
-            );
+            // Instantiate under parent first, then apply local transform values
+            GameObject obstacle = Instantiate(entry.prefab, obstacleParent);
 
+            // Apply stored values as LOCAL transforms (not world)
+            obstacle.transform.localPosition = entry.position;
+            obstacle.transform.localRotation = entry.rotation;
             obstacle.transform.localScale = entry.scale;
+
             spawnedObstacles.Add(obstacle);
         }
 

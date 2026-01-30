@@ -60,11 +60,11 @@ public class MelodyData : ScriptableObject
         notes.Sort((a, b) => a.time.CompareTo(b.time));
     }
 
-    private void OnValidate()
-    {
-        // Auto-sort notes in editor when values change
-        SortNotes();
-    }
+    // private void OnValidate()
+    // {
+    //     // Auto-sort notes in editor when values change
+    //     SortNotes();
+    // }
 }
 
 /// <summary>

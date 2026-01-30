@@ -18,8 +18,24 @@ MonoBehaviour:
   obstacles:
   - prefab: {fileID: 7318456882497151702, guid: ada86b011cf99954398dd1f1745e45cc, type: 3}
     position: {x: -0.21, y: 0, z: 2.21}
-    rotation: {x: 0.707053, y: 0.008718936, z: -0.008718936, w: 0.707053}
-    scale: {x: 0.2233739, y: 1.700094, z: 0}
-  playerUnits: []
-  enemyUnits: []
-  availableCommands: []
+    rotation: {x: 0.70710677, y: 0, z: 0, w: 0.70710677}
+    scale: {x: 0.2233739, y: 1.700094, z: 1}
+  - prefab: {fileID: 7318456882497151702, guid: ada86b011cf99954398dd1f1745e45cc, type: 3}
+    position: {x: -2.66, y: 0, z: 0.89}
+    rotation: {x: 0.7067606, y: -0.022124413, z: 0.022124413, w: 0.7067606}
+    scale: {x: 0.1897478, y: 1.053123, z: 1}
+  - prefab: {fileID: 7318456882497151702, guid: ada86b011cf99954398dd1f1745e45cc, type: 3}
+    position: {x: 5.0571, y: 0, z: 0.0236}
+    rotation: {x: 0.66607726, y: 0.23736283, z: -0.23736283, w: 0.66607726}
+    scale: {x: 0.07371959, y: 1.948008, z: 1}
+  playerUnits:
+  - unitPrefab: {fileID: 5277253596333079612, guid: d1187cf06656e6846aa42b7cd3339c0e, type: 3}
+    spawnPosition: {x: -4.56, y: 2.94, z: 0}
+  - unitPrefab: {fileID: 5277253596333079612, guid: d1187cf06656e6846aa42b7cd3339c0e, type: 3}
+    spawnPosition: {x: -3.71, y: -0.2, z: 0}
+  enemyUnits:
+  - unitPrefab: {fileID: 359604003831679815, guid: 76f5bddc29795c245bfe49e3d5e75dc9, type: 3}
+    spawnPosition: {x: 6.37, y: -0.2, z: 0}
+  availableCommands:
+  - {fileID: 11400000, guid: c86d293431b8bac468f39837e0f76cdc, type: 2}
+  - {fileID: 11400000, guid: 0f0df695ef180df4a95ef57e66c34cdb, type: 2}
