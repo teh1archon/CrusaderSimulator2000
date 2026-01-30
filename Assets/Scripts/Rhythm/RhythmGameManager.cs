@@ -70,6 +70,26 @@ public class RhythmGameManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        // Auto-create audio sources if not assigned (for testing)
+        EnsureAudioSources();
+    }
+
+    private void EnsureAudioSources()
+    {
+        if (musicSource == null)
+        {
+            musicSource = gameObject.AddComponent<AudioSource>();
+            musicSource.playOnAwake = false;
+            Debug.Log("[RhythmGameManager] Created music AudioSource");
+        }
+
+        if (sfxSource == null)
+        {
+            sfxSource = gameObject.AddComponent<AudioSource>();
+            sfxSource.playOnAwake = false;
+            Debug.Log("[RhythmGameManager] Created SFX AudioSource");
+        }
     }
 
     private void Update()
@@ -115,8 +135,9 @@ public class RhythmGameManager : MonoBehaviour
         // Check for missed notes
         CheckMissedNotes();
 
-        // Check if melody is complete
-        if (melodyTime >= currentMelody.duration + missWindow)
+        // Check if melody is complete (account for note offset)
+        float effectiveDuration = currentMelody.duration + currentMelody.noteTimeOffset;
+        if (melodyTime >= effectiveDuration + missWindow)
         {
             CompleteMelody();
         }
@@ -189,17 +210,20 @@ public class RhythmGameManager : MonoBehaviour
         {
             var note = currentMelody.notes[nextNoteIndex];
 
+            // Apply the global offset to note time
+            float adjustedTime = note.time + currentMelody.noteTimeOffset;
+
             // Spawn note when it's within scroll time
-            if (note.time <= melodyTime + noteScrollTime)
+            if (adjustedTime <= melodyTime + noteScrollTime)
             {
                 activeNotes.Add(new ActiveNote
                 {
-                    targetTime = note.time,
+                    targetTime = adjustedTime,
                     lane = note.lane,
                     wasHit = false
                 });
 
-                OnNoteSpawned?.Invoke(note.lane, note.time);
+                OnNoteSpawned?.Invoke(note.lane, adjustedTime);
                 nextNoteIndex++;
             }
             else

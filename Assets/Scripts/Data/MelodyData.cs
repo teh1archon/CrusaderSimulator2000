@@ -22,6 +22,9 @@ public class MelodyData : ScriptableObject
     [Range(0f, 5f)]
     public float startDelay = 2f;
 
+    [Tooltip("Global offset added to all note times (seconds). Use this to sync notes with music without editing each note.")]
+    public float noteTimeOffset = 0f;
+
     [Header("Audio")]
     [Tooltip("Music track to play during this melody (OGG/MP3/WAV)")]
     public AudioClip musicTrack;
