@@ -14,6 +14,13 @@ public class RhythmGameManager : MonoBehaviour
     [SerializeField] private float noteScrollTime = 2f;  // Time for note to travel across screen
     [SerializeField] private float missWindow = 0.2f;    // Time after note passes before auto-miss
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource musicSource;    // For melody music tracks
+    [SerializeField] private AudioSource sfxSource;      // For hit/miss sound effects
+    [SerializeField] private AudioClip missSound;        // Sound played when note is missed
+    [SerializeField] private AudioClip hitSound;         // Optional: sound played on hit
+    [SerializeField] [Range(0f, 1f)] private float sfxVolume = 0.5f;
+
     [Header("Current State")]
     [SerializeField] private MelodyData currentMelody;
     [SerializeField] private bool isPlaying;
@@ -88,6 +95,7 @@ public class RhythmGameManager : MonoBehaviour
                 isCountingDown = false;
                 isPlaying = true;
                 melodyTime = 0f;
+                StartMelodyMusic();
                 OnCountdownComplete?.Invoke();
                 Debug.Log("Countdown complete - melody starting!");
             }
@@ -151,6 +159,7 @@ public class RhythmGameManager : MonoBehaviour
         {
             isCountingDown = false;
             isPlaying = true;
+            StartMelodyMusic();
         }
 
         OnMelodyStarted?.Invoke(melody);
@@ -168,6 +177,7 @@ public class RhythmGameManager : MonoBehaviour
 
         isPlaying = false;
         isCountingDown = false;
+        StopMelodyMusic();
         OnMelodyInterrupted?.Invoke();
         Debug.Log("Melody interrupted!");
     }
@@ -276,6 +286,7 @@ public class RhythmGameManager : MonoBehaviour
 
                 OnNoteMissed?.Invoke(note.lane);
                 OnScoreChanged?.Invoke(currentScore);
+                PlayMissSound();
 
                 Debug.Log($"Missed! Lane: {note.lane}, Points: {TimingJudge.MISS_POINTS}, Total: {currentScore}");
             }
@@ -285,9 +296,43 @@ public class RhythmGameManager : MonoBehaviour
     private void CompleteMelody()
     {
         isPlaying = false;
+        StopMelodyMusic();
         OnMelodyCompleted?.Invoke(currentScore);
         Debug.Log($"Melody completed! Final score: {currentScore}");
     }
+
+    #region Audio
+
+    private void StartMelodyMusic()
+    {
+        if (musicSource == null || currentMelody == null) return;
+        if (currentMelody.musicTrack == null) return;
+
+        musicSource.clip = currentMelody.musicTrack;
+        musicSource.volume = currentMelody.musicVolume;
+        musicSource.Play();
+        Debug.Log($"Playing music: {currentMelody.musicTrack.name}");
+    }
+
+    private void StopMelodyMusic()
+    {
+        if (musicSource == null) return;
+        musicSource.Stop();
+    }
+
+    private void PlayMissSound()
+    {
+        if (sfxSource == null || missSound == null) return;
+        sfxSource.PlayOneShot(missSound, sfxVolume);
+    }
+
+    private void PlayHitSound()
+    {
+        if (sfxSource == null || hitSound == null) return;
+        sfxSource.PlayOneShot(hitSound, sfxVolume);
+    }
+
+    #endregion
 
     // Public accessors
     public bool IsPlaying => isPlaying;

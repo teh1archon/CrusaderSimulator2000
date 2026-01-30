@@ -22,6 +22,14 @@ public class MelodyData : ScriptableObject
     [Range(0f, 5f)]
     public float startDelay = 2f;
 
+    [Header("Audio")]
+    [Tooltip("Music track to play during this melody (OGG/MP3/WAV)")]
+    public AudioClip musicTrack;
+
+    [Tooltip("Volume for the music track")]
+    [Range(0f, 1f)]
+    public float musicVolume = 1f;
+
     [Tooltip("Sorted list of notes - add entries with time (seconds) and lane (key)")]
     public List<NoteEntry> notes = new List<NoteEntry>();
 
