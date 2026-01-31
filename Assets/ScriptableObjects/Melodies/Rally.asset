@@ -15,10 +15,12 @@ MonoBehaviour:
   melodyName: Rally
   bpm: 120
   duration: 4
+  startDelay: 0
+  noteTimeOffset: 0.25
+  musicTrack: {fileID: 8300000, guid: dcb4f44e0386eb644ac37d0a145ef642, type: 3}
+  musicVolume: 1
   notes:
-  - time: 0.5
-    lane: 4
-  - time: 1
+  - time: 0.75
     lane: 3
   - time: 1.5
     lane: 2
@@ -27,20 +29,16 @@ MonoBehaviour:
   - time: 2.5
     lane: 0
   - time: 3
-    lane: 1
-  - time: 3.5
-    lane: 0
-  - time: 0.5
-    lane: 4
-  - time: 1
     lane: 3
-  - time: 1.5
+  - time: 3.125
     lane: 2
-  - time: 2
+  - time: 3.25
     lane: 1
-  - time: 2.5
-    lane: 0
-  - time: 3
+  - time: 3.75
     lane: 1
-  - time: 3.5
-    lane: 0
+  - time: 4.5
+    lane: 3
+  - time: 5
+    lane: 1
+  - time: 10
+    lane: 4
