@@ -63,20 +63,19 @@ public class CommandListUI : MonoBehaviour
     {
         if (!useArrowKeys || commands.Count == 0) return;
 
-        // Don't allow navigation while executing
-        if (isExecuting) return;
-
-        // Arrow key navigation
+        // Arrow key navigation - auto-execute on selection change per GDD
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             SelectPrevious();
+            ExecuteSelected();  // Auto-execute on switch
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             SelectNext();
+            ExecuteSelected();  // Auto-execute on switch
         }
 
-        // Enter to execute selected command
+        // Enter also works to execute/re-execute selected command
         if (Input.GetKeyDown(selectKey))
         {
             ExecuteSelected();

@@ -23,5 +23,5 @@ MonoBehaviour:
   duration: 5
   moraleGainOnSuccess: 5
   moraleLossOnFail: 5
-  minimumScoreToExecute: 30
-  perfectScoreThreshold: 85
+  minimumScoreToExecute: 2
+  perfectScoreThreshold: 10

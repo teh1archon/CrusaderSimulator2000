@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// Main unit component that manages runtime state.
@@ -398,15 +399,37 @@ public class Unit : MonoBehaviour
 
     /// <summary>
     /// Trigger engagement with nearest enemy (called by CommandExecutor for Attack/Charge commands)
-    /// Uses extended detection range since this is an explicit command
+    /// Uses extended detection range since this is an explicit command.
+    /// If no enemies found, moves forward (right for player, left for enemy) a random distance.
     /// </summary>
     public void EngageNearestEnemy()
     {
-        Unit enemy = FindNearestEnemyInRange(detectionRange * 2f);  // Extended range for commands
+        float searchRange = detectionRange * 2f;
+        Unit enemy = FindNearestEnemyInRange(searchRange);
         if (enemy != null)
         {
             currentTarget = enemy;
             SetState(UnitState.Moving);
+            Debug.Log($"[Unit] {name} engaging {enemy.name} at distance {Vector2.Distance(transform.position, enemy.transform.position):F1}");
+        }
+        else
+        {
+            // No enemies in sight - advance forward
+            // Player units move right (+X), enemy units move left (-X)
+            float advanceX = Random.Range(1f, 3f) * (isPlayerUnit ? 1f : -1f);
+            float advanceY = Random.Range(-1f, 1f);
+            Vector3 advancePosition = transform.position + new Vector3(advanceX, advanceY, 0f);
+
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.SetDestination(advancePosition);
+                SetState(UnitState.Moving);
+                Debug.Log($"[Unit] {name} advancing to {advancePosition} (no enemies in range {searchRange})");
+            }
+            else
+            {
+                Debug.LogWarning($"[Unit] {name} cannot advance - agent not on NavMesh");
+            }
         }
     }
 

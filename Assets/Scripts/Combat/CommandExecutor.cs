@@ -54,6 +54,11 @@ public class CommandExecutor : MonoBehaviour
         {
             rhythmManager.OnMelodyCompleted += HandleMelodyCompleted;
             rhythmManager.OnMelodyInterrupted += HandleMelodyInterrupted;
+            Debug.Log("[CommandExecutor] Subscribed to RhythmGameManager events");
+        }
+        else
+        {
+            Debug.LogError("[CommandExecutor] RhythmGameManager.Instance is null - cannot subscribe to events!");
         }
     }
 
@@ -89,6 +94,7 @@ public class CommandExecutor : MonoBehaviour
 
     /// <summary>
     /// Start executing a command (begins the melody)
+    /// Per GDD: Switching during countdown = no penalty, switching during actual melody = penalty
     /// </summary>
     public bool StartCommand(CommandData command)
     {
@@ -98,9 +104,25 @@ public class CommandExecutor : MonoBehaviour
             return false;
         }
 
-        if (isExecutingCommand)
+        // If already executing, check if we should penalize
+        if (isExecutingCommand && activeCommand != null && rhythmManager != null)
         {
-            Debug.LogWarning("Already executing a command - will interrupt");
+            // Only penalize if melody was actually playing (not in countdown)
+            if (rhythmManager.IsPlaying)
+            {
+                // Apply morale penalty for interrupting during actual playback
+                if (moraleManager != null)
+                {
+                    moraleManager.ChangeMorale(-activeCommand.moraleLossOnFail);
+                }
+                OnCommandInterrupted?.Invoke(activeCommand);
+                Debug.Log($"Switched command during melody - morale penalty applied");
+            }
+            else if (rhythmManager.IsCountingDown)
+            {
+                // Was in countdown - no penalty, just switch
+                Debug.Log($"Switched command during countdown - no penalty");
+            }
         }
 
         activeCommand = command;
@@ -140,7 +162,13 @@ public class CommandExecutor : MonoBehaviour
 
     private void HandleMelodyCompleted(int rawScore)
     {
-        if (!isExecutingCommand || activeCommand == null) return;
+        Debug.Log($"[CommandExecutor] HandleMelodyCompleted called with score {rawScore}, isExecuting={isExecutingCommand}, activeCommand={activeCommand?.commandName ?? "null"}");
+
+        if (!isExecutingCommand || activeCommand == null)
+        {
+            Debug.LogWarning("[CommandExecutor] Not executing or no active command - ignoring melody completion");
+            return;
+        }
 
         // Convert raw score to percentage (0-100)
         float scorePercent = CalculateScorePercent(rawScore);
@@ -221,20 +249,30 @@ public class CommandExecutor : MonoBehaviour
     /// </summary>
     private void ExecuteEffect(CommandData command, float strength)
     {
+        if (unitSpawner == null)
+        {
+            unitSpawner = UnitSpawner.Instance;
+            if (unitSpawner == null)
+            {
+                Debug.LogError("[CommandExecutor] UnitSpawner.Instance is null - cannot apply effects!");
+                return;
+            }
+        }
+
         List<Unit> targets = GetTargetUnits(command);
 
         if (targets.Count == 0)
         {
-            Debug.LogWarning($"No valid targets for command {command.commandName}");
+            Debug.LogWarning($"[CommandExecutor] No valid targets for command {command.commandName}");
             return;
         }
+
+        Debug.Log($"[CommandExecutor] Applying {command.effectType} to {targets.Count} units at {strength:F2}x strength");
 
         foreach (var unit in targets)
         {
             ApplyEffectToUnit(unit, command, strength);
         }
-
-        Debug.Log($"Applied {command.effectType} to {targets.Count} units at {strength:F2}x strength");
     }
 
     private List<Unit> GetTargetUnits(CommandData command)
