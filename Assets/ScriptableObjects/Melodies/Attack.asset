@@ -13,15 +13,20 @@ MonoBehaviour:
   m_Name: Attack
   m_EditorClassIdentifier: 
   melodyName: Attack
-  bpm: 80
+  bpm: 90
   duration: 3
   startDelay: 2
+  noteTimeOffset: 0
+  musicTrack: {fileID: 8300000, guid: 116c8b2046aba6847a3df40a24fd97fc, type: 3}
+  musicVolume: 1
   notes:
   - time: 1
     lane: 1
-  - time: 1.5
-    lane: 2
-  - time: 2
+  - time: 1.75
+    lane: 1
+  - time: 3.5
+    lane: 1
+  - time: 4
     lane: 3
-  - time: 2.5
+  - time: 4.5
     lane: 4
