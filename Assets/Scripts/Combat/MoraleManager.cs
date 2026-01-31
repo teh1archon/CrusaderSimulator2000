@@ -48,12 +48,15 @@ public class MoraleManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        // Initialize morale in Awake so UI can read it in Start
+        currentMorale = startingMorale;
+        UpdateMoraleState();
+        OnMoraleChanged?.Invoke(currentMorale, maxMorale);
     }
 
     private void Start()
     {
-        currentMorale = startingMorale;
-        UpdateMoraleState();
 
         // Subscribe to unit events
         unitSpawner = UnitSpawner.Instance;

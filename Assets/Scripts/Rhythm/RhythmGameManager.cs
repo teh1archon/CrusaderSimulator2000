@@ -329,13 +329,27 @@ public class RhythmGameManager : MonoBehaviour
 
     private void StartMelodyMusic()
     {
-        if (musicSource == null || currentMelody == null) return;
-        if (currentMelody.musicTrack == null) return;
+        if (musicSource == null)
+        {
+            Debug.LogWarning("[RhythmGameManager] musicSource is null - cannot play music");
+            return;
+        }
+        if (currentMelody == null)
+        {
+            Debug.LogWarning("[RhythmGameManager] currentMelody is null - cannot play music");
+            return;
+        }
+        if (currentMelody.musicTrack == null)
+        {
+            Debug.Log($"[RhythmGameManager] No music track assigned for melody: {currentMelody.melodyName}");
+            return;
+        }
 
         musicSource.clip = currentMelody.musicTrack;
         musicSource.volume = currentMelody.musicVolume;
+        musicSource.spatialBlend = 0f;  // Ensure 2D audio
         musicSource.Play();
-        Debug.Log($"Playing music: {currentMelody.musicTrack.name}");
+        Debug.Log($"[RhythmGameManager] Playing music: {currentMelody.musicTrack.name} (volume: {currentMelody.musicVolume})");
     }
 
     private void StopMelodyMusic()
