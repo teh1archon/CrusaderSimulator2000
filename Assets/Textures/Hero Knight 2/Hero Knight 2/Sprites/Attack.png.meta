@@ -254,7 +254,7 @@ TextureImporter:
         width: 48
         height: 32
       alignment: 9
-      pivot: {x: 0.5, y: 0.16}
+      pivot: {x: 0.81758624, y: 0.26756835}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -291,6 +291,7 @@ TextureImporter:
       Attack_3: 1262318607
       Attack_4: 1143451055
       Attack_5: -908163521
+      Attack_6: 1960973215
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
