@@ -37,5 +37,8 @@ MonoBehaviour:
   - unitPrefab: {fileID: 359604003831679815, guid: 76f5bddc29795c245bfe49e3d5e75dc9, type: 3}
     spawnPosition: {x: 6.37, y: -0.2, z: 0}
   availableCommands:
+  - {fileID: 11400000, guid: f83959d482016b04b8fcdb79eea10900, type: 2}
   - {fileID: 11400000, guid: c86d293431b8bac468f39837e0f76cdc, type: 2}
   - {fileID: 11400000, guid: 0f0df695ef180df4a95ef57e66c34cdb, type: 2}
+  - {fileID: 11400000, guid: bc43d17488728804994f39207fef3c88, type: 2}
+  - {fileID: 11400000, guid: e46246b8438fbfe468b29009b0e4f559, type: 2}
