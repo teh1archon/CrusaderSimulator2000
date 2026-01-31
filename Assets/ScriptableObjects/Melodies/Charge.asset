@@ -15,7 +15,7 @@ MonoBehaviour:
   melodyName: Charge
   bpm: 160
   duration: 2.5
-  startDelay: 2
+  startDelay: 1.01
   noteTimeOffset: 0
   musicTrack: {fileID: 8300000, guid: c1728bbf7770e0942ae493fec0579937, type: 3}
   musicVolume: 1
