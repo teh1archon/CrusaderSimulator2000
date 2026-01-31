@@ -35,8 +35,19 @@ public class UnitAnimator : MonoBehaviour
 
     private Unit unit;
     private UnityEngine.AI.NavMeshAgent agent;
-    private UnitState lastState = UnitState.Idle;
     private bool hasAnimator;
+
+    // Cache which parameters exist to avoid checking every frame
+    private bool hasIsMoving;
+    private bool hasIsAttacking;
+    private bool hasIsReady;
+    private bool hasDie;
+    private bool hasTakeHit;
+
+    // Track last values to only update on change
+    private bool lastIsMoving;
+    private bool lastIsAttacking;
+    private bool lastIsReady;
 
     private void Awake()
     {
@@ -51,6 +62,22 @@ public class UnitAnimator : MonoBehaviour
         if (!hasAnimator)
         {
             Debug.LogWarning($"[UnitAnimator] {name} has no Animator component - animations disabled");
+            return;
+        }
+
+        // Cache parameter existence once
+        CacheParameters();
+    }
+
+    private void CacheParameters()
+    {
+        foreach (var param in animator.parameters)
+        {
+            if (param.nameHash == IsMovingHash) hasIsMoving = true;
+            else if (param.nameHash == IsAttackingHash) hasIsAttacking = true;
+            else if (param.nameHash == IsReadyHash) hasIsReady = true;
+            else if (param.nameHash == DieHash) hasDie = true;
+            else if (param.nameHash == TakeHitHash) hasTakeHit = true;
         }
     }
 
@@ -76,64 +103,50 @@ public class UnitAnimator : MonoBehaviour
 
     private void Update()
     {
-        if (!hasAnimator) return;
+        if (!hasAnimator || !hasIsMoving) return;
 
-        // Update movement animation based on actual velocity
+        // Check if moving based on actual velocity
         bool isMoving = agent != null && agent.velocity.sqrMagnitude > moveSpeedThreshold * moveSpeedThreshold;
-        SetBool(IsMovingHash, isMoving);
+
+        // Only update animator if value changed
+        if (isMoving != lastIsMoving)
+        {
+            lastIsMoving = isMoving;
+            animator.SetBool(IsMovingHash, isMoving);
+        }
     }
 
     private void OnUnitStateChanged(UnitState newState)
     {
         if (!hasAnimator) return;
 
-        // Reset all state bools first
-        SetBool(IsAttackingHash, false);
-        SetBool(IsReadyHash, false);
+        // Determine new values
+        bool newIsAttacking = newState == UnitState.Attacking;
+        bool newIsReady = newState == UnitState.Defending;
 
-        switch (newState)
+        // Only update if changed
+        if (hasIsAttacking && newIsAttacking != lastIsAttacking)
         {
-            case UnitState.Idle:
-                // Just idle - no special parameters needed
-                break;
-
-            case UnitState.Moving:
-                // IsMoving is handled in Update based on velocity
-                break;
-
-            case UnitState.Attacking:
-                SetBool(IsAttackingHash, true);
-                break;
-
-            case UnitState.Defending:
-                // Defending = ready stance
-                SetBool(IsReadyHash, true);
-                break;
-
-            case UnitState.Retreating:
-                // Retreating uses same animation as moving
-                break;
-
-            case UnitState.Dead:
-                TriggerDeath();
-                break;
+            lastIsAttacking = newIsAttacking;
+            animator.SetBool(IsAttackingHash, newIsAttacking);
         }
 
-        lastState = newState;
+        if (hasIsReady && newIsReady != lastIsReady)
+        {
+            lastIsReady = newIsReady;
+            animator.SetBool(IsReadyHash, newIsReady);
+        }
+
+        // Handle death
+        if (newState == UnitState.Dead)
+        {
+            TriggerDeath();
+        }
     }
 
     private void OnHealthChanged(int current, int max)
     {
-        if (!hasAnimator) return;
-
-        // Trigger hit animation when taking damage (not on heal)
-        // We detect damage by checking if health decreased
-        // Note: This is called even on death, so check if still alive
-        if (unit != null && unit.IsAlive && current < max)
-        {
-            // Could track previous health to detect damage vs heal
-            // For now, just use the TakeHit trigger on any health change that isn't max
-        }
+        // Could trigger hit animation here if tracking previous health
     }
 
     /// <summary>
@@ -141,8 +154,8 @@ public class UnitAnimator : MonoBehaviour
     /// </summary>
     public void TriggerHit()
     {
-        if (!hasAnimator) return;
-        SetTrigger(TakeHitHash);
+        if (!hasAnimator || !hasTakeHit) return;
+        animator.SetTrigger(TakeHitHash);
     }
 
     /// <summary>
@@ -151,12 +164,26 @@ public class UnitAnimator : MonoBehaviour
     public void TriggerDeath()
     {
         if (!hasAnimator) return;
-        SetTrigger(DieHash);
 
-        // Stop all other animations
-        SetBool(IsMovingHash, false);
-        SetBool(IsAttackingHash, false);
-        SetBool(IsReadyHash, false);
+        if (hasDie)
+            animator.SetTrigger(DieHash);
+
+        // Force stop movement animation
+        if (hasIsMoving)
+        {
+            lastIsMoving = false;
+            animator.SetBool(IsMovingHash, false);
+        }
+        if (hasIsAttacking)
+        {
+            lastIsAttacking = false;
+            animator.SetBool(IsAttackingHash, false);
+        }
+        if (hasIsReady)
+        {
+            lastIsReady = false;
+            animator.SetBool(IsReadyHash, false);
+        }
     }
 
     /// <summary>
@@ -164,36 +191,12 @@ public class UnitAnimator : MonoBehaviour
     /// </summary>
     public void SetReady(bool ready)
     {
-        if (!hasAnimator) return;
-        SetBool(IsReadyHash, ready);
-    }
-
-    // Safe parameter setters that check if parameter exists
-    private void SetBool(int hash, bool value)
-    {
-        if (animator != null && HasParameter(hash))
+        if (!hasAnimator || !hasIsReady) return;
+        if (ready != lastIsReady)
         {
-            animator.SetBool(hash, value);
+            lastIsReady = ready;
+            animator.SetBool(IsReadyHash, ready);
         }
-    }
-
-    private void SetTrigger(int hash)
-    {
-        if (animator != null && HasParameter(hash))
-        {
-            animator.SetTrigger(hash);
-        }
-    }
-
-    private bool HasParameter(int hash)
-    {
-        // Check if animator has this parameter
-        foreach (var param in animator.parameters)
-        {
-            if (param.nameHash == hash)
-                return true;
-        }
-        return false;
     }
 
     private void OnUnitDeath(Unit deadUnit)

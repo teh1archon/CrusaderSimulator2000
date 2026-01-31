@@ -135,12 +135,37 @@ public class RhythmGameManager : MonoBehaviour
         // Check for missed notes
         CheckMissedNotes();
 
-        // Check if melody is complete (account for note offset)
-        float effectiveDuration = currentMelody.duration + currentMelody.noteTimeOffset;
-        if (melodyTime >= effectiveDuration + missWindow)
+        // Check if melody is complete
+        // Use actual last note time (not just duration field) to ensure all notes can be hit
+        float lastNoteTime = GetLastNoteTime();
+        if (melodyTime >= lastNoteTime + missWindow)
         {
             CompleteMelody();
         }
+    }
+
+    /// <summary>
+    /// Get the time of the last note (including offset), or duration if no notes
+    /// </summary>
+    private float GetLastNoteTime()
+    {
+        if (currentMelody == null) return 0f;
+
+        if (currentMelody.notes.Count > 0)
+        {
+            // Find the latest note time (notes should be sorted, but check all to be safe)
+            float maxTime = 0f;
+            foreach (var note in currentMelody.notes)
+            {
+                float adjustedTime = note.time + currentMelody.noteTimeOffset;
+                if (adjustedTime > maxTime)
+                    maxTime = adjustedTime;
+            }
+            return maxTime;
+        }
+
+        // Fallback to duration if no notes
+        return currentMelody.duration + currentMelody.noteTimeOffset;
     }
 
     /// <summary>
@@ -386,7 +411,9 @@ public class RhythmGameManager : MonoBehaviour
     /// </summary>
     public float GetProgress()
     {
-        if (currentMelody == null || currentMelody.duration <= 0) return 0f;
-        return Mathf.Clamp01(melodyTime / currentMelody.duration);
+        if (currentMelody == null) return 0f;
+        float lastNoteTime = GetLastNoteTime();
+        if (lastNoteTime <= 0) return 0f;
+        return Mathf.Clamp01(melodyTime / lastNoteTime);
     }
 }
